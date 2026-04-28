@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>카드뉴스 업로드</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, "Apple SD Gothic Neo", sans-serif; }
+    body { background: #f5f5f5; padding: 16px; }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    h1 { font-size: 22px; margin-bottom: 6px; color: #222; }
+    .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
+    .preview-box {
+      background: #fafafa;
+      border: 2px dashed #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-box img { max-width: 100%; max-height: 280px; border-radius: 8px; }
+    .label { font-size: 15px; color: #555; margin-bottom: 8px; display: block; font-weight: 500; }
+    input[type="password"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: white;
+    }
+    .file-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .file-btn {
+      flex: 1;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 500;
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .file-btn:active { background: #e5e5e5; }
+    input[type="file"] { display: none; }
+    .btn {
+      width: 100%;
+      padding: 18px;
+      font-size: 17px;
+      font-weight: 600;
+      background: #00AEEF;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn:disabled { background: #ccc; }
+    .btn:active:not(:disabled) { background: #0099cc; }
+    .status {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      text-align: center;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.success { background: #e7f7e7; color: #2a7a2a; }
+    .status.error { background: #fce8e8; color: #b02020; }
+    .status.loading { background: #fff7d6; color: #8a6a00; }
+    .file-info { font-size: 13px; color: #888; margin-top: 4px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📤 카드뉴스 올리기</h1>
+    <p class="subtitle">새 이미지를 올리면 곧바로 반영됩니다.</p>
+
+    <label class="label">현재 화면에 보이는 카드뉴스</label>
+    <div class="preview-box">
+      <img id="currentImg" alt="현재 카드">
+    </div>
+
+    <label class="label">비밀번호</label>
+    <input type="password" id="password" placeholder="비밀번호 입력" autocomplete="current-password">
+
+    <label class="label">새 카드뉴스 이미지</label>
+    <div class="file-row">
+      <label class="file-btn" for="fileGallery">📁 사진첩</label>
+      <label class="file-btn" for="fileCamera">📷 카메라</label>
+    </div>
+    <input type="file" id="fileGallery" accept="image/*">
+    <input type="file" id="fileCamera" accept="image/*" capture="environment">
+
+    <div class="preview-box" id="newPreview" style="display:none;">
+      <img id="newImg" alt="새 카드 미리보기">
+    </div>
+    <div class="file-info" id="fileInfo"></div>
+
+    <button class="btn" id="uploadBtn" onclick="upload()" style="margin-top:16px;">올리기</button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    let selectedFile = null;
+
+    document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
+
+    ['fileGallery', 'fileCamera'].forEach(id => {
+      document.getElementById(id).addEventListener('change', handleFile);
+    });
+
+    async function handleFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const info = document.getElementById('fileInfo');
+      info.textContent = `원본: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+
+      try {
+        const compressed = await compressImage(file, 1600, 0.85);
+        selectedFile = compressed;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          document.getElementById('newImg').src = ev.target.result;
+          document.getElementById('newPreview').style.display = 'flex';
+          info.textContent += ` → 압축: ${(compressed.size/1024/1024).toFixed(1)}MB`;
+        };
+        reader.readAsDataURL(compressed);
+      } catch (err) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          document.getElementById('newImg').src = ev.target.result;
+          document.getElementById('newPreview').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function compressImage(file, maxSize, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let { width, height } = img;
+            if (width > maxSize || height > maxSize) {
+              if (width > height) {
+                height = Math.round(height * maxSize / width);
+                width = maxSize;
+              } else {
+                width = Math.round(width * maxSize / height);
+                height = maxSize;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+              (blob) => blob ? resolve(new File([blob], 'card.jpg', { type: 'image/jpeg' })) : reject(new Error('압축 실패')),
+              'image/jpeg',
+              quality
+            );
+          };
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function upload() {
+      const pw = document.getElementById('password').value;
+      const btn = document.getElementById('uploadBtn');
+
+      if (!pw) { showStatus('비밀번호를 입력해주세요.', 'error'); return; }
+      if (!selectedFile) { showStatus('파일을 선택해주세요.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '올리는 중...';
+      showStatus('올리는 중입니다. 잠시만 기다려주세요.', 'loading');
+
+      try {
+        const base64 = await fileToBase64(selectedFile);
+
+        const res = await fetch('/.netlify/functions/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            password: pw,
+            content: base64,
+            filename: selectedFile.name
+          })
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          showStatus('✅ 올렸습니다! 1~2분 뒤 QR 페이지에 반영됩니다.', 'success');
+          selectedFile = null;
+          document.getElementById('fileGallery').value = '';
+          document.getElementById('fileCamera').value = '';
+          document.getElementById('newPreview').style.display = 'none';
+          document.getElementById('fileInfo').textContent = '';
+          setTimeout(() => {
+            document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
+          }, 90000);
+        } else {
+          showStatus('❌ ' + (result.error || '올리기 실패'), 'error');
+        }
+      } catch (err) {
+        showStatus('❌ 오류: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '올리기';
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function showStatus(msg, type) {
+      const s = document.getElementById('status');
+      s.textContent = msg;
+      s.className = 'status show ' + type;
+    }
+  </script>
+</body>
+</html>
