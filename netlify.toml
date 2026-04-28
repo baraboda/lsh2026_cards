@@ -1,4 +1,0 @@
-[[redirects]]
-  from = "/m/:id"
-  to = "/.netlify/functions/m?id=:id"
-  status = 200
