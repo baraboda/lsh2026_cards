@@ -14,7 +14,7 @@ exports.handler = async (event) => {
   const pageUrl = `https://lsh2026.netlify.app/m/${id}`;
 
   let title = `이수희 후보 카드뉴스 #${id}`;
-  let description = '강동구청장 후보 이수희';
+  let description = '강동구청장 예비후보 이수희';
 
   try {
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
