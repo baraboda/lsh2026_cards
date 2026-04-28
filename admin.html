@@ -3,251 +3,443 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>카드뉴스 업로드</title>
+  <title>이수희 카드뉴스 관리</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, "Apple SD Gothic Neo", sans-serif; }
-    body { background: #f5f5f5; padding: 16px; }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      padding: 24px 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
+    body { background: #f5f5f5; padding: 16px; padding-bottom: 60px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .card { background: white; border-radius: 16px; padding: 24px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 16px; }
     h1 { font-size: 22px; margin-bottom: 6px; color: #222; }
     .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
-    .preview-box {
-      background: #fafafa;
-      border: 2px dashed #ddd;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 16px;
-      min-height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    
+    .tabs { display: flex; background: white; border-radius: 12px; padding: 4px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .tab { flex: 1; padding: 14px; text-align: center; font-size: 15px; font-weight: 600; color: #888; border-radius: 8px; cursor: pointer; }
+    .tab.active { background: #00AEEF; color: white; }
+
+    .preview-box { background: #fafafa; border: 2px dashed #ddd; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 16px; min-height: 180px; display: flex; align-items: center; justify-content: center; }
     .preview-box img { max-width: 100%; max-height: 280px; border-radius: 8px; }
     .label { font-size: 15px; color: #555; margin-bottom: 8px; display: block; font-weight: 500; }
-    input[type="password"] {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      background: white;
-    }
+    input[type="password"], input[type="text"] { width: 100%; padding: 14px; font-size: 16px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 16px; background: white; }
     .file-row { display: flex; gap: 8px; margin-bottom: 16px; }
-    .file-btn {
-      flex: 1;
-      padding: 16px;
-      font-size: 15px;
-      font-weight: 500;
-      background: #f0f0f0;
-      color: #333;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      cursor: pointer;
-      text-align: center;
-    }
+    .file-btn { flex: 1; padding: 16px; font-size: 15px; font-weight: 500; background: #f0f0f0; color: #333; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; text-align: center; }
     .file-btn:active { background: #e5e5e5; }
     input[type="file"] { display: none; }
-    .btn {
-      width: 100%;
-      padding: 18px;
-      font-size: 17px;
-      font-weight: 600;
-      background: #00AEEF;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+    .btn { width: 100%; padding: 18px; font-size: 17px; font-weight: 600; background: #00AEEF; color: white; border: none; border-radius: 10px; cursor: pointer; }
     .btn:disabled { background: #ccc; }
     .btn:active:not(:disabled) { background: #0099cc; }
-    .status {
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      text-align: center;
-      display: none;
-    }
+    .btn-secondary { background: #6c757d; }
+    .btn-danger { background: #dc3545; }
+
+    .status { margin-top: 16px; padding: 14px; border-radius: 8px; font-size: 15px; text-align: center; display: none; }
     .status.show { display: block; }
     .status.success { background: #e7f7e7; color: #2a7a2a; }
     .status.error { background: #fce8e8; color: #b02020; }
     .status.loading { background: #fff7d6; color: #8a6a00; }
+
+    .result-card { background: #f0f9ff; border: 2px solid #00AEEF; border-radius: 12px; padding: 16px; margin-top: 16px; display: none; }
+    .result-card.show { display: block; }
+    .result-card h3 { font-size: 16px; margin-bottom: 12px; color: #006a99; }
+    .url-box { background: white; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; word-break: break-all; margin-bottom: 12px; border: 1px solid #d0e8f5; }
+    .copy-btn { width: 100%; padding: 14px; background: #00AEEF; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .copy-btn.copied { background: #2a7a2a; }
+    .activation-notice { font-size: 13px; color: #8a6a00; background: #fff7d6; padding: 10px; border-radius: 6px; margin-top: 8px; text-align: center; }
+
+    .list-section h2 { font-size: 18px; margin-bottom: 12px; color: #222; }
+    .list-empty { text-align: center; color: #999; padding: 30px 0; font-size: 14px; }
+    .list-item { display: flex; gap: 12px; padding: 12px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 8px; align-items: center; }
+    .list-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; background: #eee; }
+    .list-item-info { flex: 1; min-width: 0; }
+    .list-item-id { font-weight: 600; font-size: 14px; color: #333; }
+    .list-item-time { font-size: 12px; color: #999; margin-top: 2px; }
+    .list-item-url { font-size: 11px; color: #00AEEF; margin-top: 2px; word-break: break-all; }
+    .list-actions { display: flex; flex-direction: column; gap: 4px; }
+    .mini-btn { padding: 6px 10px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+    .mini-btn.copy { background: #00AEEF; color: white; }
+    .mini-btn.copy.copied { background: #2a7a2a; }
+    .mini-btn.delete { background: #fce8e8; color: #b02020; }
     .file-info { font-size: 13px; color: #888; margin-top: 4px; text-align: center; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📤 카드뉴스 올리기</h1>
-    <p class="subtitle">새 이미지를 올리면 곧바로 반영됩니다.</p>
-
-    <label class="label">현재 화면에 보이는 카드뉴스</label>
-    <div class="preview-box">
-      <img id="currentImg" alt="현재 카드">
-    </div>
-
-    <label class="label">비밀번호</label>
-    <input type="password" id="password" placeholder="비밀번호 입력" autocomplete="current-password">
-
-    <label class="label">새 카드뉴스 이미지</label>
-    <div class="file-row">
-      <label class="file-btn" for="fileGallery">📁 사진첩</label>
-      <label class="file-btn" for="fileCamera">📷 카메라</label>
-    </div>
-    <input type="file" id="fileGallery" accept="image/*">
-    <input type="file" id="fileCamera" accept="image/*" capture="environment">
-
-    <div class="preview-box" id="newPreview" style="display:none;">
-      <img id="newImg" alt="새 카드 미리보기">
-    </div>
-    <div class="file-info" id="fileInfo"></div>
-
-    <button class="btn" id="uploadBtn" onclick="upload()" style="margin-top:16px;">올리기</button>
-
-    <div class="status" id="status"></div>
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-panel="qr">📱 QR용</div>
+    <div class="tab" data-panel="msg">💬 문자용</div>
   </div>
 
-  <script>
-    let selectedFile = null;
+  <!-- QR 패널 -->
+  <div class="panel active" id="panel-qr">
+    <div class="card">
+      <h1>📱 QR 카드뉴스 갱신</h1>
+      <p class="subtitle">QR 누르면 보이는 카드뉴스를 교체합니다.</p>
 
-    document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
+      <label class="label">현재 카드뉴스</label>
+      <div class="preview-box">
+        <img id="currentImg" alt="현재 카드">
+      </div>
 
-    ['fileGallery', 'fileCamera'].forEach(id => {
-      document.getElementById(id).addEventListener('change', handleFile);
+      <label class="label">비밀번호</label>
+      <input type="password" id="qrPassword" placeholder="비밀번호 입력" autocomplete="current-password">
+
+      <label class="label">새 카드뉴스 이미지</label>
+      <div class="file-row">
+        <label class="file-btn" for="qrFileGallery">📁 사진첩</label>
+        <label class="file-btn" for="qrFileCamera">📷 카메라</label>
+      </div>
+      <input type="file" id="qrFileGallery" accept="image/*">
+      <input type="file" id="qrFileCamera" accept="image/*" capture="environment">
+
+      <div class="preview-box" id="qrNewPreview" style="display:none;">
+        <img id="qrNewImg" alt="미리보기">
+      </div>
+      <div class="file-info" id="qrFileInfo"></div>
+
+      <button class="btn" id="qrUploadBtn" onclick="uploadQR()" style="margin-top:16px;">올리기</button>
+      <div class="status" id="qrStatus"></div>
+    </div>
+  </div>
+
+  <!-- 문자용 패널 -->
+  <div class="panel" id="panel-msg">
+    <div class="card">
+      <h1>💬 문자용 카드뉴스</h1>
+      <p class="subtitle">올리면 바로 링크가 생성됩니다.</p>
+
+      <label class="label">비밀번호</label>
+      <input type="password" id="msgPassword" placeholder="비밀번호 입력" autocomplete="current-password">
+
+      <label class="label">제목 (선택, 카톡 미리보기에 표시)</label>
+      <input type="text" id="msgTitle" placeholder="예: 강동구 교육 공약">
+
+      <label class="label">카드뉴스 이미지</label>
+      <div class="file-row">
+        <label class="file-btn" for="msgFileGallery">📁 사진첩</label>
+        <label class="file-btn" for="msgFileCamera">📷 카메라</label>
+      </div>
+      <input type="file" id="msgFileGallery" accept="image/*">
+      <input type="file" id="msgFileCamera" accept="image/*" capture="environment">
+
+      <div class="preview-box" id="msgNewPreview" style="display:none;">
+        <img id="msgNewImg" alt="미리보기">
+      </div>
+      <div class="file-info" id="msgFileInfo"></div>
+
+      <button class="btn" id="msgUploadBtn" onclick="uploadMsg()" style="margin-top:16px;">올리기</button>
+      <div class="status" id="msgStatus"></div>
+
+      <div class="result-card" id="resultCard">
+        <h3>✅ 올렸습니다!</h3>
+        <div class="url-box" id="resultUrl"></div>
+        <button class="copy-btn" id="resultCopyBtn" onclick="copyResultUrl()">📋 링크 복사</button>
+        <div class="activation-notice">
+          ⏱ 1~2분 뒤에 링크가 활성화됩니다.<br>
+          보내기 전에 링크 한 번 눌러서 확인하세요.
+        </div>
+      </div>
+    </div>
+
+    <div class="card list-section">
+      <h2>📋 최근 30개</h2>
+      <div id="msgList">
+        <div class="list-empty">불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SITE = window.location.origin; // lsh2026.netlify.app
+
+// 탭 전환
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+    if (tab.dataset.panel === 'msg') loadList();
+  });
+});
+
+// 비밀번호 공유 (한 번만 입력하면 양쪽에 적용)
+['qrPassword', 'msgPassword'].forEach(id => {
+  document.getElementById(id).addEventListener('input', (e) => {
+    const other = id === 'qrPassword' ? 'msgPassword' : 'qrPassword';
+    document.getElementById(other).value = e.target.value;
+  });
+});
+
+// =============== QR 패널 ===============
+document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
+let qrSelectedFile = null;
+['qrFileGallery', 'qrFileCamera'].forEach(id => {
+  document.getElementById(id).addEventListener('change', (e) => handleFile(e, 'qr'));
+});
+
+async function uploadQR() {
+  const pw = document.getElementById('qrPassword').value;
+  const btn = document.getElementById('qrUploadBtn');
+  if (!pw) return showStatus('qrStatus', '비밀번호를 입력해주세요.', 'error');
+  if (!qrSelectedFile) return showStatus('qrStatus', '파일을 선택해주세요.', 'error');
+
+  btn.disabled = true; btn.textContent = '올리는 중...';
+  showStatus('qrStatus', '올리는 중입니다.', 'loading');
+
+  try {
+    const base64 = await fileToBase64(qrSelectedFile);
+    const res = await fetch('/.netlify/functions/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, content: base64, filename: qrSelectedFile.name })
     });
-
-    async function handleFile(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const info = document.getElementById('fileInfo');
-      info.textContent = `원본: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
-
-      try {
-        const compressed = await compressImage(file, 1600, 0.85);
-        selectedFile = compressed;
-
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          document.getElementById('newImg').src = ev.target.result;
-          document.getElementById('newPreview').style.display = 'flex';
-          info.textContent += ` → 압축: ${(compressed.size/1024/1024).toFixed(1)}MB`;
-        };
-        reader.readAsDataURL(compressed);
-      } catch (err) {
-        selectedFile = file;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          document.getElementById('newImg').src = ev.target.result;
-          document.getElementById('newPreview').style.display = 'flex';
-        };
-        reader.readAsDataURL(file);
-      }
+    const result = await res.json();
+    if (res.ok) {
+      showStatus('qrStatus', '✅ 올렸습니다! 1~2분 뒤 반영됩니다.', 'success');
+      qrSelectedFile = null;
+      document.getElementById('qrFileGallery').value = '';
+      document.getElementById('qrFileCamera').value = '';
+      document.getElementById('qrNewPreview').style.display = 'none';
+      document.getElementById('qrFileInfo').textContent = '';
+      setTimeout(() => {
+        document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
+      }, 90000);
+    } else {
+      showStatus('qrStatus', '❌ ' + (result.error || '실패'), 'error');
     }
+  } catch (err) {
+    showStatus('qrStatus', '❌ ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '올리기';
+  }
+}
 
-    function compressImage(file, maxSize, quality) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            let { width, height } = img;
-            if (width > maxSize || height > maxSize) {
-              if (width > height) {
-                height = Math.round(height * maxSize / width);
-                width = maxSize;
-              } else {
-                width = Math.round(width * maxSize / height);
-                height = maxSize;
-              }
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob(
-              (blob) => blob ? resolve(new File([blob], 'card.jpg', { type: 'image/jpeg' })) : reject(new Error('압축 실패')),
-              'image/jpeg',
-              quality
-            );
-          };
-          img.onerror = () => reject(new Error('이미지 로드 실패'));
-          img.src = e.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+// =============== 문자용 패널 ===============
+let msgSelectedFile = null;
+let lastUploadedId = null;
+
+['msgFileGallery', 'msgFileCamera'].forEach(id => {
+  document.getElementById(id).addEventListener('change', (e) => handleFile(e, 'msg'));
+});
+
+async function uploadMsg() {
+  const pw = document.getElementById('msgPassword').value;
+  const title = document.getElementById('msgTitle').value;
+  const btn = document.getElementById('msgUploadBtn');
+  if (!pw) return showStatus('msgStatus', '비밀번호를 입력해주세요.', 'error');
+  if (!msgSelectedFile) return showStatus('msgStatus', '파일을 선택해주세요.', 'error');
+
+  btn.disabled = true; btn.textContent = '올리는 중...';
+  showStatus('msgStatus', '올리는 중입니다.', 'loading');
+  document.getElementById('resultCard').classList.remove('show');
+
+  try {
+    const base64 = await fileToBase64(msgSelectedFile);
+    const res = await fetch('/.netlify/functions/upload-msg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, content: base64, title: title || '' })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      showStatus('msgStatus', '', 'success');
+      document.getElementById('msgStatus').classList.remove('show');
+      
+      lastUploadedId = result.id;
+      const url = `${SITE}/m/${result.id}`;
+      document.getElementById('resultUrl').textContent = url;
+      document.getElementById('resultCard').classList.add('show');
+      const copyBtn = document.getElementById('resultCopyBtn');
+      copyBtn.textContent = '📋 링크 복사';
+      copyBtn.classList.remove('copied');
+
+      // 입력 초기화
+      msgSelectedFile = null;
+      document.getElementById('msgFileGallery').value = '';
+      document.getElementById('msgFileCamera').value = '';
+      document.getElementById('msgNewPreview').style.display = 'none';
+      document.getElementById('msgFileInfo').textContent = '';
+      document.getElementById('msgTitle').value = '';
+
+      // 목록 갱신
+      setTimeout(loadList, 3000);
+    } else {
+      showStatus('msgStatus', '❌ ' + (result.error || '실패'), 'error');
     }
+  } catch (err) {
+    showStatus('msgStatus', '❌ ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '올리기';
+  }
+}
 
-    async function upload() {
-      const pw = document.getElementById('password').value;
-      const btn = document.getElementById('uploadBtn');
+async function copyResultUrl() {
+  const url = document.getElementById('resultUrl').textContent;
+  await copyToClipboard(url);
+  const btn = document.getElementById('resultCopyBtn');
+  btn.textContent = '✓ 복사되었습니다!';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = '📋 링크 복사';
+    btn.classList.remove('copied');
+  }, 2000);
+}
 
-      if (!pw) { showStatus('비밀번호를 입력해주세요.', 'error'); return; }
-      if (!selectedFile) { showStatus('파일을 선택해주세요.', 'error'); return; }
+async function loadList() {
+  const listDiv = document.getElementById('msgList');
+  try {
+    const res = await fetch('/.netlify/functions/list-msg?t=' + Date.now());
+    const data = await res.json();
+    if (!data.list || data.list.length === 0) {
+      listDiv.innerHTML = '<div class="list-empty">아직 올린 카드뉴스가 없습니다.</div>';
+      return;
+    }
+    listDiv.innerHTML = data.list.map(item => {
+      const url = `${SITE}/m/${item.id}`;
+      const imgUrl = `https://raw.githubusercontent.com/${getRepo()}/main/msg/${item.id}.jpg`;
+      const time = formatTime(item.uploadedAt);
+      return `
+        <div class="list-item">
+          <img src="${imgUrl}" alt="" onerror="this.style.opacity=0.3">
+          <div class="list-item-info">
+            <div class="list-item-id">#${item.id} ${escapeHtml(item.title || '')}</div>
+            <div class="list-item-time">${time}</div>
+            <div class="list-item-url">${url}</div>
+          </div>
+          <div class="list-actions">
+            <button class="mini-btn copy" onclick="copyListUrl(this, '${url}')">복사</button>
+            <button class="mini-btn delete" onclick="deleteMsg(${item.id})">삭제</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    listDiv.innerHTML = '<div class="list-empty">불러오기 실패</div>';
+  }
+}
 
-      btn.disabled = true;
-      btn.textContent = '올리는 중...';
-      showStatus('올리는 중입니다. 잠시만 기다려주세요.', 'loading');
+async function copyListUrl(btn, url) {
+  await copyToClipboard(url);
+  const original = btn.textContent;
+  btn.textContent = '✓ 복사됨';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+}
 
-      try {
-        const base64 = await fileToBase64(selectedFile);
+async function deleteMsg(id) {
+  if (!confirm(`#${id} 카드뉴스를 삭제하시겠습니까?\n(이미 보낸 메시지의 링크는 더 이상 작동하지 않습니다.)`)) return;
+  const pw = document.getElementById('msgPassword').value;
+  if (!pw) { alert('비밀번호를 먼저 입력해주세요.'); return; }
+  try {
+    const res = await fetch('/.netlify/functions/delete-msg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, id })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      loadList();
+    } else {
+      alert('삭제 실패: ' + (result.error || ''));
+    }
+  } catch (err) {
+    alert('오류: ' + err.message);
+  }
+}
 
-        const res = await fetch('/.netlify/functions/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            password: pw,
-            content: base64,
-            filename: selectedFile.name
-          })
-        });
+// repo 정보 (raw 이미지 URL용) - 환경에 따라 하드코딩
+function getRepo() {
+  return 'baraboda/lsh2026_cards';
+}
 
-        const result = await res.json();
+// =============== 공통 유틸 ===============
+async function handleFile(e, prefix) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const info = document.getElementById(prefix + 'FileInfo');
+  info.textContent = `원본: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+  try {
+    const compressed = await compressImage(file, 1600, 0.85);
+    if (prefix === 'qr') qrSelectedFile = compressed; else msgSelectedFile = compressed;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById(prefix + 'NewImg').src = ev.target.result;
+      document.getElementById(prefix + 'NewPreview').style.display = 'flex';
+      info.textContent += ` → 압축: ${(compressed.size/1024/1024).toFixed(1)}MB`;
+    };
+    reader.readAsDataURL(compressed);
+  } catch (err) {
+    if (prefix === 'qr') qrSelectedFile = file; else msgSelectedFile = file;
+  }
+}
 
-        if (res.ok) {
-          showStatus('✅ 올렸습니다! 1~2분 뒤 QR 페이지에 반영됩니다.', 'success');
-          selectedFile = null;
-          document.getElementById('fileGallery').value = '';
-          document.getElementById('fileCamera').value = '';
-          document.getElementById('newPreview').style.display = 'none';
-          document.getElementById('fileInfo').textContent = '';
-          setTimeout(() => {
-            document.getElementById('currentImg').src = 'current.jpg?t=' + Date.now();
-          }, 90000);
-        } else {
-          showStatus('❌ ' + (result.error || '올리기 실패'), 'error');
+function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSize || height > maxSize) {
+          if (width > height) { height = Math.round(height * maxSize / width); width = maxSize; }
+          else { width = Math.round(width * maxSize / height); height = maxSize; }
         }
-      } catch (err) {
-        showStatus('❌ 오류: ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '올리기';
-      }
-    }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => blob ? resolve(new File([blob], 'card.jpg', { type: 'image/jpeg' })) : reject(new Error('압축 실패')),
+          'image/jpeg', quality
+        );
+      };
+      img.onerror = () => reject(new Error('이미지 로드 실패'));
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-    function showStatus(msg, type) {
-      const s = document.getElementById('status');
-      s.textContent = msg;
-      s.className = 'status show ' + type;
-    }
-  </script>
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+}
+
+function showStatus(id, msg, type) {
+  const s = document.getElementById(id);
+  s.textContent = msg;
+  s.className = 'status show ' + type;
+}
+
+function formatTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return '방금';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  return d.toLocaleDateString('ko-KR') + ' ' + d.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
