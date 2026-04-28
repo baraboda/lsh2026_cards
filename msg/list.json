@@ -9,7 +9,8 @@
     "id": 2,
     "title": "가장 든든한 내편",
     "uploadedAt": "2026-04-28T07:36:05.813Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-28T07:42:42.877Z"
   },
   {
     "id": 1,
