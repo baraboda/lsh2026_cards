@@ -1,1 +1,1 @@
-/m/:id  /.netlify/functions/m?id=:id  200
+/m/* /.netlify/functions/m?id=:splat 200
