@@ -3,6 +3,7 @@
     "id": 1,
     "title": "강동구 핵심과제",
     "uploadedAt": "2026-04-28T06:57:24.163Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-28T07:35:41.915Z"
   }
 ]
