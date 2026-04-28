@@ -1,18 +1,21 @@
 exports.handler = async (event) => {
-  const id = event.queryStringParameters?.id;
+  // path 또는 query string에서 id 추출
+  let id = event.queryStringParameters?.id;
+  if (!id && event.path) {
+    const match = event.path.match(/\/m\/(\d+)/);
+    if (match) id = match[1];
+  }
   if (!id) {
     return { statusCode: 400, body: 'id required' };
   }
 
   const REPO = process.env.GITHUB_REPO;
-  // 공개 raw URL (토큰 불필요, 공개 repo니까)
   const imageUrl = `https://raw.githubusercontent.com/${REPO}/main/msg/${id}.jpg`;
   const pageUrl = `https://lsh2026.netlify.app/m/${id}`;
 
-  // list.json에서 제목 가져오기 (없으면 기본값)
   let title = `이수희 후보 카드뉴스 #${id}`;
   let description = '강동구청장 후보 이수희';
-  
+
   try {
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     const listRes = await fetch(`https://api.github.com/repos/${REPO}/contents/msg/list.json`, {
@@ -37,7 +40,7 @@ exports.handler = async (event) => {
       }
     }
   } catch (e) {
-    // 무시하고 기본값 사용
+    // 무시
   }
 
   const html = `<!DOCTYPE html>
