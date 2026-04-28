@@ -3,7 +3,8 @@
     "id": 3,
     "title": "강동의 새로운 일상",
     "uploadedAt": "2026-04-28T07:42:19.285Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-28T07:46:06.097Z"
   },
   {
     "id": 2,
