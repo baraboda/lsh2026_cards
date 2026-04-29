@@ -16,7 +16,8 @@
     "id": 5,
     "title": "기다린 만큼, 반드시 결실로",
     "uploadedAt": "2026-04-28T07:49:52.869Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-29T13:55:35.259Z"
   },
   {
     "id": 4,
