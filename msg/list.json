@@ -23,7 +23,8 @@
     "id": 4,
     "title": "강동에서 산다는 것이 특권이 되도록",
     "uploadedAt": "2026-04-28T07:48:34.231Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-29T13:55:42.754Z"
   },
   {
     "id": 3,
