@@ -9,7 +9,8 @@
     "id": 6,
     "title": "강동에서 나고 자라는 것이 자랑이 되도록",
     "uploadedAt": "2026-04-28T07:51:07.399Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-29T13:55:29.289Z"
   },
   {
     "id": 5,
