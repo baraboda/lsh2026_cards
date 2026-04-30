@@ -15,7 +15,8 @@
     "id": 8,
     "title": "강동구 이번엔 반드시 집으로 돌아옵니다",
     "uploadedAt": "2026-04-29T13:57:36.530Z",
-    "deleted": false
+    "deleted": true,
+    "deletedAt": "2026-04-30T07:00:57.792Z"
   },
   {
     "id": 7,
